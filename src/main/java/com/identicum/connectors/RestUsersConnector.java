@@ -55,8 +55,8 @@ import com.evolveum.polygon.rest.AbstractRestConnector;
 @ConnectorClass(displayNameKey = "connector.identicum.rest.display", configurationClass = RestUsersConfiguration.class)
 public class RestUsersConnector 
 	extends AbstractRestConnector<RestUsersConfiguration> 
-	implements CreateOp, UpdateOp, SchemaOp, SearchOp<RestUsersFilter>, DeleteOp, UpdateAttributeValuesOp, TestOp, TestApiOp {
-    
+	implements CreateOp, UpdateOp, SchemaOp, SearchOp<RestUsersFilter>, DeleteOp, UpdateAttributeValuesOp, TestOp, TestApiOp 
+{
     // Definición de log y constantes para los endpoints de usuarios y roles
     private static final Log LOG = Log.getLog(RestUsersConnector.class);
     private static final String USERS_ENDPOINT = "/api/v1/patrons";
@@ -104,7 +104,7 @@ public class RestUsersConnector
         attrRoles.setRequired(false);
         accountBuilder.addAttributeInfo(attrRoles.build());
 
-	// Definir la clase de objeto Account
+	    // Definir la clase de objeto Account
         schemaBuilder.defineObjectClass(accountBuilder.build());
 
         // Definir la clase de objeto Group (roles/grupos)
@@ -290,7 +290,7 @@ public class RestUsersConnector
             throw new ConnectorException("Unexpected response format");
         }
     }
-// Manejo de errores en la respuesta del servidor
+    // Manejo de errores en la respuesta del servidor
     public void processResponseErrors(CloseableHttpResponse response) {
         int statusCode = response.getStatusLine().getStatusCode();
         if (statusCode >= 200 && statusCode <= 299) {
