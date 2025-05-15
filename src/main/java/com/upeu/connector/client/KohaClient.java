@@ -1,6 +1,7 @@
 package com.upeu.connector.client;
 
 import com.upeu.connector.KohaConfiguration;
+import com.upeu.connector.util.ErrorHandler;
 import org.apache.hc.client5.http.classic.methods.*;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -35,18 +36,18 @@ public class KohaClient {
         JSONObject payload = new JSONObject();
         payload.put("userid", config.getUsername());
         payload.put("password", config.getPassword());
-
         post.setEntity(new StringEntity(payload.toString()));
 
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(post)) {
 
+            String result = readResponse(response);
             int status = response.getCode();
+
             if (status != HttpStatus.SC_OK) {
-                throw new RuntimeException("Autenticación fallida: HTTP " + status);
+                ErrorHandler.handleKohaError(status, result);
             }
 
-            String result = readResponse(response);
             JSONObject json = new JSONObject(result);
             this.token = json.getString("token");
         }
@@ -73,7 +74,15 @@ public class KohaClient {
 
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(post)) {
-            return new JSONObject(readResponse(response));
+
+            String body = readResponse(response);
+            int status = response.getCode();
+
+            if (status != HttpStatus.SC_CREATED && status != HttpStatus.SC_OK) {
+                ErrorHandler.handleKohaError(status, body);
+            }
+
+            return new JSONObject(body);
         }
     }
 
@@ -85,7 +94,15 @@ public class KohaClient {
 
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(put)) {
-            return new JSONObject(readResponse(response));
+
+            String body = readResponse(response);
+            int status = response.getCode();
+
+            if (status != HttpStatus.SC_OK) {
+                ErrorHandler.handleKohaError(status, body);
+            }
+
+            return new JSONObject(body);
         }
     }
 
@@ -95,7 +112,13 @@ public class KohaClient {
 
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(delete)) {
-            // Puede revisar el status si lo deseas
+
+            String body = readResponse(response);
+            int status = response.getCode();
+
+            if (status != HttpStatus.SC_NO_CONTENT && status != HttpStatus.SC_OK) {
+                ErrorHandler.handleKohaError(status, body);
+            }
         }
     }
 
@@ -106,7 +129,15 @@ public class KohaClient {
 
         try (CloseableHttpClient client = HttpClients.createDefault();
              CloseableHttpResponse response = client.execute(get)) {
-            return readResponse(response);
+
+            String body = readResponse(response);
+            int status = response.getCode();
+
+            if (status != HttpStatus.SC_OK) {
+                ErrorHandler.handleKohaError(status, body);
+            }
+
+            return body;
         }
     }
 

@@ -1,0 +1,11 @@
+<schemaConfig xmlns="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/schema-config-3"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/schema-config-3
+                                  http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/schema-config-3.xsd">
+
+    <schema>
+        <objectClass type="__ACCOUNT__">
+            <schemaHandler>com.upeu.connector.schema.PatronSchema</schemaHandler>
+        </objectClass>
+    </schema>
+</schemaConfig>
