@@ -11,19 +11,29 @@ import java.util.List;
 /**
  * Lógica de gestión de usuarios (patrons) en Koha.
  */
-public abstract class PatronHandler extends BaseHandler {
+public class PatronHandler extends BaseHandler {
 
     public PatronHandler(EndpointRegistry endpointRegistry) {
         super(endpointRegistry);
     }
 
-    public List<Patron> getAll() throws Exception {
-        JSONArray jsonArray = new JSONArray(kohaClient.getAllPatrons());
-        List<Patron> patrons = new ArrayList<>();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            patrons.add(Patron.fromJson(jsonArray.getJSONObject(i)));
+    /**
+     * Lista todos los usuarios registrados en Koha.
+     */
+    public List<Patron> getAll() {
+        try {
+            JSONArray jsonArray = new JSONArray(kohaClient.getAllPatrons());
+            List<Patron> patrons = new ArrayList<>();
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject patronJson = jsonArray.getJSONObject(i);
+                patrons.add(Patron.fromJson(patronJson));
+            }
+
+            return patrons;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener lista de usuarios", e);
         }
-        return patrons;
     }
 
     public Patron getById(String borrowernumber) {
