@@ -7,14 +7,20 @@ import com.upeu.connector.KohaConfiguration;
  */
 public class EndpointRegistry {
 
+    private final KohaConfiguration configuration;
     private final String baseUrl;
 
     public EndpointRegistry(KohaConfiguration config) {
+        this.configuration = config;
         this.baseUrl = config.getBaseUrl();
     }
 
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    public KohaConfiguration getConfig() {
+        return configuration;
     }
 
     public boolean ping() {
