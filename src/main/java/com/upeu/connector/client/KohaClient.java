@@ -26,7 +26,7 @@ public class KohaClient {
     }
 
     /**
-     * Autenticación contra Koha y guarda el token.
+     * Realiza autenticación contra Koha y guarda el token JWT.
      */
     public void authenticate() throws Exception {
         String url = config.getBaseUrl() + "/api/v1/authentication";
@@ -53,20 +53,39 @@ public class KohaClient {
         }
     }
 
+    /**
+     * Verifica si ya hay un token disponible.
+     */
+    private boolean isAuthenticated() {
+        return token != null && !token.isBlank();
+    }
+
+    /**
+     * Asegura que la autenticación esté lista antes de cualquier operación.
+     */
+    private void ensureAuthenticated() throws Exception {
+        if (!isAuthenticated()) {
+            authenticate();
+        }
+    }
+
     public String getToken() {
         return token;
     }
 
     public String getAllPatrons() throws Exception {
+        ensureAuthenticated();
         return get(config.getBaseUrl() + "/api/v1/patrons");
     }
 
     public JSONObject getJson(String endpoint) throws Exception {
+        ensureAuthenticated();
         String result = get(config.getBaseUrl() + endpoint);
         return new JSONObject(result);
     }
 
     public JSONObject postJson(String endpoint, JSONObject payload) throws Exception {
+        ensureAuthenticated();
         HttpPost post = new HttpPost(config.getBaseUrl() + endpoint);
         post.setHeader("Authorization", "Bearer " + token);
         post.setHeader("Content-Type", "application/json");
@@ -87,6 +106,7 @@ public class KohaClient {
     }
 
     public JSONObject putJson(String endpoint, JSONObject payload) throws Exception {
+        ensureAuthenticated();
         HttpPut put = new HttpPut(config.getBaseUrl() + endpoint);
         put.setHeader("Authorization", "Bearer " + token);
         put.setHeader("Content-Type", "application/json");
@@ -107,6 +127,7 @@ public class KohaClient {
     }
 
     public void delete(String endpoint) throws Exception {
+        ensureAuthenticated();
         HttpDelete delete = new HttpDelete(config.getBaseUrl() + endpoint);
         delete.setHeader("Authorization", "Bearer " + token);
 
