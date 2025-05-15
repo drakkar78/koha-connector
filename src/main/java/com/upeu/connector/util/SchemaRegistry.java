@@ -1,20 +1,43 @@
 package com.upeu.connector.util;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.upeu.connector.schema.PatronSchema;
+import org.identityconnectors.framework.common.objects.ObjectClassInfo;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Registra y gestiona todos los esquemas disponibles del conector.
+ * Registro de esquemas disponibles para los objetos del conector.
  */
 public class SchemaRegistry {
 
-    private final List<Object> schemas = new ArrayList<>();
+    private final Map<String, ObjectClassInfo> schemaMap = new HashMap<>();
 
-    public void register(Object schema) {
-        schemas.add(schema);
+    public SchemaRegistry() {
+        loadSchemas();
     }
 
-    public List<Object> getSchemas() {
-        return schemas;
+    private void loadSchemas() {
+        PatronSchema patronSchema = new PatronSchema();
+        schemaMap.put("account", patronSchema.getPatronSchema());
+    }
+
+    /**
+     * Obtiene un esquema registrado por su tipo (e.g., "account").
+     */
+    public ObjectClassInfo getSchema(String type) {
+        return schemaMap.get(type);
+    }
+
+    /**
+     * Retorna todos los esquemas registrados.
+     */
+    public Map<String, ObjectClassInfo> getAllSchemas() {
+        return Collections.unmodifiableMap(schemaMap);
+    }
+
+    public void register(PatronSchema patronSchema) {
+
     }
 }

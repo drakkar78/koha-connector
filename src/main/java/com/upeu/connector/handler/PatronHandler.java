@@ -14,57 +14,35 @@ import java.util.List;
 public class PatronHandler extends BaseHandler {
 
     public PatronHandler(EndpointRegistry endpointRegistry) {
-        super(endpointRegistry); // Ya contiene el KohaClient autenticado
+        super(endpointRegistry);
     }
 
-    /**
-     * Lista todos los usuarios registrados en Koha.
-     */
-    public List<Patron> getAll() {
-        try {
-            JSONArray jsonArray = new JSONArray(kohaClient.getAllPatrons());
-            List<Patron> patrons = new ArrayList<>();
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject patronJson = jsonArray.getJSONObject(i);
-                patrons.add(Patron.fromJson(patronJson));
-            }
-
-            return patrons;
-        } catch (Exception e) {
-            throw new RuntimeException("Error al obtener lista de usuarios", e);
+    public List<Patron> getAll() throws Exception {
+        JSONArray jsonArray = new JSONArray(kohaClient.getAllPatrons());
+        List<Patron> patrons = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            patrons.add(Patron.fromJson(jsonArray.getJSONObject(i)));
         }
+        return patrons;
     }
 
-    /**
-     * Obtiene un usuario por su borrowernumber.
-     */
     public Patron getById(String borrowernumber) {
         JSONObject json = getJson("/api/v1/patrons/" + borrowernumber);
         return Patron.fromJson(json);
     }
 
-    /**
-     * Crea un nuevo usuario.
-     */
     public Patron create(Patron patron) {
         JSONObject payload = patron.toJson();
         JSONObject created = postJson("/api/v1/patrons", payload);
         return Patron.fromJson(created);
     }
 
-    /**
-     * Actualiza un usuario existente por su borrowernumber.
-     */
     public Patron update(String borrowernumber, Patron patron) {
         JSONObject payload = patron.toJson();
         JSONObject updated = putJson("/api/v1/patrons/" + borrowernumber, payload);
         return Patron.fromJson(updated);
     }
 
-    /**
-     * Elimina un usuario por su borrowernumber.
-     */
     public boolean deleteByBorrowerNumber(String borrowernumber) {
         delete("/api/v1/patrons/" + borrowernumber);
         return true;

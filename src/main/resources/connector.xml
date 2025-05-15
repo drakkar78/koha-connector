@@ -1,0 +1,10 @@
+<connector xmlns="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3
+                               http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3.xsd">
+
+    <displayName>Koha Connector</displayName>
+    <connectorType>com.upeu.connector.KohaConnector</connectorType>
+    <bundle>koha-connector</bundle>
+    <version>1.0.0</version>
+</connector>

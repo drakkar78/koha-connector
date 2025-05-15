@@ -1,35 +1,94 @@
-# rest-users-connectors
+# 🧩 Koha Connector for MidPoint
 
-A sample Rest Connector for midPoint implementing the Rest Connector Superclass model
+Este conector permite integrar [Koha ILS](https://koha-community.org/) con [Evolveum MidPoint](https://evolveum.com/midpoint/), usando su API REST oficial.
 
-# Installation
+---
 
-1. Clone this repository
+## 📌 Características soportadas
 
-```
-git clone git@github.com:Identicum/rest-users-connector.git
-```
+- ✅ Autenticación contra `/api/v1/authentication`
+- ✅ CRUD completo de usuarios (`/api/v1/patrons`)
+- ✅ Mapeo de atributos comunes (`userid`, `surname`, `email`, etc.)
+- ✅ Compatible con ConnId y MidPoint 4.9+
 
-2. Compile the sources and run the application
+---
 
-```
-cd rest-users-connector
+## 📦 Requisitos
+
+- Java 17+
+- MidPoint 4.9+
+- Koha ≥ 21.11 con API REST habilitada
+- Token-based authentication habilitada (`/api/v1/authentication`)
+
+---
+
+## ⚙️ Configuración en MidPoint
+
+### 1. Importar el conector
+
+1. Empaqueta con Maven:
+
+```bash
 mvn clean package
 ```
 
-3. Copy the connector jar to the midpoint folder
+2. Copia el `.jar` resultante:
 
+```bash
+cp target/koha-connector-1.0.0.jar midpoint_home/icf-connectors/
 ```
-cp target/rest-users-connector-0.0.X-SNAPSHOT.jar $MIDPOINT_HOME/var/icf-connectors/
+
+3. Reinicia MidPoint.
+
+---
+
+### 2. Crear recurso
+
+- Tipo de conector: **Koha Connector**
+- Clase: `com.upeu.connector.KohaConnector`
+- Parámetros:
+
+| Propiedad   | Descripción                  |
+|-------------|------------------------------|
+| `baseUrl`   | URL base del Koha Staff API  |
+| `username`  | Usuario del API REST         |
+| `password`  | Contraseña del API           |
+
+---
+
+## 🔐 API de Koha usada
+
+- Autenticación: `POST /api/v1/authentication`
+- Operaciones de usuario:
+    - `GET /api/v1/patrons`
+    - `GET /api/v1/patrons/{id}`
+    - `POST /api/v1/patrons`
+    - `PUT /api/v1/patrons/{id}`
+    - `DELETE /api/v1/patrons/{id}`
+
+---
+
+## 🛠️ Compilar
+
+```bash
+mvn clean package
 ```
 
-4. Restart midPoint
+---
 
-5. Create the resource using the connector
+## 🧪 Test (opcional)
 
+Este proyecto aún **no incluye test unitarios**, pero puede extenderse usando `connector-test-common` para pruebas ConnId.
 
-# References
+---
 
-* Rest Users Api: https://github.com/Identicum/rest-users-api
-* Rest Connector Superclass: https://wiki.evolveum.com/display/midPoint/REST+Connector+Superclass 
-* Rest Resource Example: https://github.com/Evolveum/midpoint/tree/master/samples/resources/rest
+## 🧑‍💻 Autores
+
+- UPeU CRAI - Proyecto MidPoint
+- Basado en ConnId y MidPoint 4.x
+
+---
+
+## 📄 Licencia
+
+Este proyecto usa licencia MIT. Ver archivo [LICENSE](LICENSE).
