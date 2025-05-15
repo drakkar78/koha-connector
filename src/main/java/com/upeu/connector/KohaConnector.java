@@ -1,12 +1,16 @@
 package com.upeu.connector;
 
 import com.upeu.connector.handler.PatronHandler;
+import com.upeu.connector.model.Patron;
 import com.upeu.connector.schema.PatronSchema;
 import com.upeu.connector.util.EndpointRegistry;
 import com.upeu.connector.util.SchemaRegistry;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
+import org.identityconnectors.framework.common.objects.filter.*;
 import org.identityconnectors.framework.spi.Configuration;
 import org.identityconnectors.framework.spi.Connector;
+
+import java.util.List;
 
 /**
  * Conector Koha compatible con ConnId (MidPoint).
@@ -44,7 +48,67 @@ public class KohaConnector implements Connector {
 
     // Opcional: punto de acceso al handler de patrons
     public PatronHandler createPatronHandler() {
-        return new PatronHandler(endpointRegistry);
+        return new PatronHandler(endpointRegistry) {
+            @Override
+            public List<Patron> visitEqualsFilter(EqualsFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitAndFilter(Filter left, Filter right, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitOrFilter(Filter left, Filter right, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitNotFilter(Filter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitContainsFilter(ContainsFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitStartsWithFilter(StartsWithFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitEndsWithFilter(EndsWithFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitGreaterThanFilter(GreaterThanFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitGreaterThanOrEqualFilter(GreaterThanOrEqualFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitLessThanFilter(LessThanFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitLessThanOrEqualFilter(LessThanOrEqualFilter filter, Void param) {
+                return List.of();
+            }
+
+            @Override
+            public List<Patron> visitContainsAllValuesFilter(ContainsAllValuesFilter filter, Void param) {
+                return List.of();
+            }
+        };
     }
 
     public SchemaRegistry getSchemaRegistry() {

@@ -20,27 +20,27 @@ public class Patron {
     }
 
     public static Patron fromJson(JSONObject json) {
-        Patron p = new Patron();
-        p.borrowernumber = json.optString("borrowernumber");
-        p.cardnumber = json.optString("cardnumber");
-        p.userid = json.optString("userid");
-        p.surname = json.optString("surname");
-        p.firstname = json.optString("firstname");
-        p.categorycode = json.optString("categorycode");
-        p.branchcode = json.optString("branchcode");
-        p.email = json.optString("email");
-        return p;
+        Patron patron = new Patron();
+        patron.setBorrowernumber(json.optString("borrowernumber", null));
+        patron.setCardnumber(json.optString("cardnumber", null));
+        patron.setUserid(json.optString("userid", null));
+        patron.setSurname(json.optString("surname", null));
+        patron.setFirstname(json.optString("firstname", null));
+        patron.setCategorycode(json.optString("categorycode", null));
+        patron.setBranchcode(json.optString("branchcode", null));
+        patron.setEmail(json.optString("email", null));
+        return patron;
     }
 
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
-        json.put("cardnumber", cardnumber);
-        json.put("userid", userid);
-        json.put("surname", surname);
-        json.put("firstname", firstname);
-        json.put("categorycode", categorycode);
-        json.put("branchcode", branchcode);
-        json.put("email", email);
+        if (cardnumber != null)    json.put("cardnumber", cardnumber);
+        if (userid != null)        json.put("userid", userid);
+        if (surname != null)       json.put("surname", surname);
+        if (firstname != null)     json.put("firstname", firstname);
+        if (categorycode != null)  json.put("categorycode", categorycode);
+        if (branchcode != null)    json.put("branchcode", branchcode);
+        if (email != null)         json.put("email", email);
         return json;
     }
 

@@ -1,8 +1,12 @@
 package com.upeu.connector.handler;
 
 import com.upeu.connector.client.KohaClient;
+import com.upeu.connector.model.Patron;
 import com.upeu.connector.util.EndpointRegistry;
+import org.identityconnectors.framework.common.objects.filter.*;
 import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Base genérica para todos los handlers de entidades Koha.
@@ -66,4 +70,29 @@ public abstract class BaseHandler {
             throw new RuntimeException("DELETE falló en " + endpoint, e);
         }
     }
+
+    public abstract List<Patron> visitEqualsFilter(EqualsFilter filter, Void param);
+
+    // Los siguientes métodos no están implementados aún
+    public abstract List<Patron> visitAndFilter(Filter left, Filter right, Void param);
+
+    public abstract List<Patron> visitOrFilter(Filter left, Filter right, Void param);
+
+    public abstract List<Patron> visitNotFilter(Filter filter, Void param);
+
+    public abstract List<Patron> visitContainsFilter(ContainsFilter filter, Void param);
+
+    public abstract List<Patron> visitStartsWithFilter(StartsWithFilter filter, Void param);
+
+    public abstract List<Patron> visitEndsWithFilter(EndsWithFilter filter, Void param);
+
+    public abstract List<Patron> visitGreaterThanFilter(GreaterThanFilter filter, Void param);
+
+    public abstract List<Patron> visitGreaterThanOrEqualFilter(GreaterThanOrEqualFilter filter, Void param);
+
+    public abstract List<Patron> visitLessThanFilter(LessThanFilter filter, Void param);
+
+    public abstract List<Patron> visitLessThanOrEqualFilter(LessThanOrEqualFilter filter, Void param);
+
+    public abstract List<Patron> visitContainsAllValuesFilter(ContainsAllValuesFilter filter, Void param);
 }

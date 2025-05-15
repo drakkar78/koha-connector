@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Lógica de gestión de usuarios (patrons) en Koha.
  */
-public class PatronHandler extends BaseHandler {
+public abstract class PatronHandler extends BaseHandler {
 
     public PatronHandler(EndpointRegistry endpointRegistry) {
         super(endpointRegistry);
