@@ -2,6 +2,7 @@ package com.upeu.connector.handler;
 
 import com.upeu.connector.model.Patron;
 import com.upeu.connector.util.EndpointRegistry;
+import org.identityconnectors.framework.common.objects.filter.FilterVisitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * Lógica de gestión de usuarios (patrons) en Koha.
  */
-public class PatronHandler extends BaseHandler {
+public abstract class PatronHandler extends BaseHandler implements FilterVisitor<List<Patron>, Void> {
 
     public PatronHandler(EndpointRegistry endpointRegistry) {
         super(endpointRegistry);
