@@ -1,10 +1,7 @@
 package com.upeu.connector.handler;
 
-import com.upeu.connector.model.Patron;
 import com.upeu.connector.util.EndpointRegistry;
 import org.identityconnectors.framework.common.objects.filter.Filter;
-
-import java.util.List;
 
 /**
  * Encargado de ejecutar búsquedas con o sin filtros.
@@ -20,7 +17,7 @@ public class FilterHandler extends BaseHandler {
      * Ejecuta una búsqueda con filtro.
      * Si no hay filtro, retorna todos los usuarios.
      */
-    public List<Patron> executeQuery(Filter filter) {
+    public Object executeQuery(Filter filter) {
         PatronHandler handler = new PatronHandler(endpointRegistry);
 
         if (filter == null) {
