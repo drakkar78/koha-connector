@@ -2,6 +2,8 @@ package com.upeu.connector.handler;
 
 import com.upeu.connector.model.Patron;
 import com.upeu.connector.util.EndpointRegistry;
+import org.identityconnectors.framework.common.objects.Attribute;
+import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.FilterVisitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,25 +39,78 @@ public abstract class PatronHandler extends BaseHandler implements FilterVisitor
         }
     }
 
+    /**
+     * Obtiene un usuario por su número de tarjeta.
+     */
     public Patron getById(String borrowernumber) {
-        JSONObject json = getJson("/api/v1/patrons/" + borrowernumber);
-        return Patron.fromJson(json);
+        try {
+            JSONObject json = kohaClient.getJson("/api/v1/patrons/" + borrowernumber);
+            return Patron.fromJson(json);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al obtener usuario con ID " + borrowernumber, e);
+        }
     }
 
+    /**
+     * Crea un nuevo usuario en Koha.
+     */
     public Patron create(Patron patron) {
-        JSONObject payload = patron.toJson();
-        JSONObject created = postJson("/api/v1/patrons", payload);
-        return Patron.fromJson(created);
+        try {
+            JSONObject payload = patron.toJson();
+            JSONObject created = kohaClient.postJson("/api/v1/patrons", payload);
+            return Patron.fromJson(created);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al crear usuario", e);
+        }
     }
 
+    /**
+     * Actualiza un usuario existente.
+     */
     public Patron update(String borrowernumber, Patron patron) {
-        JSONObject payload = patron.toJson();
-        JSONObject updated = putJson("/api/v1/patrons/" + borrowernumber, payload);
-        return Patron.fromJson(updated);
+        try {
+            JSONObject payload = patron.toJson();
+            JSONObject updated = kohaClient.putJson("/api/v1/patrons/" + borrowernumber, payload);
+            return Patron.fromJson(updated);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al actualizar usuario con ID " + borrowernumber, e);
+        }
     }
 
+    /**
+     * Elimina un usuario por número.
+     */
     public boolean deleteByBorrowerNumber(String borrowernumber) {
-        delete("/api/v1/patrons/" + borrowernumber);
-        return true;
+        try {
+            kohaClient.delete("/api/v1/patrons/" + borrowernumber);
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar usuario con ID " + borrowernumber, e);
+        }
+    }
+
+    /**
+     * Soporte básico para filtro de igualdad (MidPoint).
+     */
+
+    public List<Patron> visitEqualsFilter(EqualsFilter filter, Void param) {
+        Attribute attr = filter.getAttribute();
+        String attrName = attr.getName();
+        String attrValue = attr.getValue().get(0).toString();
+
+        List<Patron> results = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(kohaClient.getAllPatrons());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject json = jsonArray.getJSONObject(i);
+                if (json.has(attrName) && attrValue.equals(json.optString(attrName))) {
+                    results.add(Patron.fromJson(json));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error aplicando filtro de igualdad", e);
+        }
+
+        return results;
     }
 }
