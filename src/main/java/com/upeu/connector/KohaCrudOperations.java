@@ -21,12 +21,10 @@ public class KohaCrudOperations {
 
     private final EndpointRegistry endpointRegistry;
     private final SchemaRegistry schemaRegistry;
-    private final ConnectorMessages messages;
 
-    public KohaCrudOperations(EndpointRegistry endpointRegistry, ConnectorMessages messages) {
+    public KohaCrudOperations(EndpointRegistry endpointRegistry, SchemaRegistry schemaRegistry) {
         this.endpointRegistry = endpointRegistry;
-        this.schemaRegistry = new SchemaRegistry(messages);
-        this.messages = messages;
+        this.schemaRegistry = schemaRegistry;
     }
 
     public Uid create(ObjectClass objectClass, Set<Attribute> attributes, OperationOptions options) {

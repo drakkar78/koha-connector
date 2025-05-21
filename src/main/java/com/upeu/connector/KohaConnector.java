@@ -35,10 +35,10 @@ public class KohaConnector implements Connector,
         // ✅ Obtener mensajes localizados desde la configuración
         ConnectorMessages messages = this.configuration.getConnectorMessages();
 
-        // ✅ Inicializar el registry con los mensajes
+        // ✅ Inicializar el schema registry con los mensajes
         this.schemaRegistry = new SchemaRegistry(messages);
 
-        // ✅ Inicializar operaciones CRUD con el registry
+        // ✅ Pasar los mensajes al CRUD
         this.crudOperations = new KohaCrudOperations(endpointRegistry, schemaRegistry);
     }
 

@@ -12,13 +12,12 @@ public class SchemaRegistry {
 
     private final Map<String, ObjectClassInfo> schemaMap = new HashMap<>();
 
-    // ✅ Constructor que acepta ConnectorMessages
     public SchemaRegistry(ConnectorMessages messages) {
         loadSchemas(messages);
     }
 
     private void loadSchemas(ConnectorMessages messages) {
-        ObjectClassInfo patronSchema = PatronSchema.build(messages); // <-- Pasa los mensajes
+        ObjectClassInfo patronSchema = PatronSchema.build(messages);
         schemaMap.put("account", patronSchema);
     }
 
