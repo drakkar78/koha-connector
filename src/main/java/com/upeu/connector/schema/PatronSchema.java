@@ -26,9 +26,9 @@ public class PatronSchema {
         attr.setRequired(required);
         attr.setType(String.class);
 
-        // Usa mensajes localizados desde koha-messages.properties
+        // Usa mensajes localizados
         String label = messages != null ? messages.format("attribute." + name, name) : name;
-        attr.setDisplayName(label);
+        attr.setNativeName(label); // ✅ Usar nativeName en lugar de displayName
 
         return attr.build();
     }
