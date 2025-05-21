@@ -8,13 +8,17 @@ import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.Filter;
 import org.identityconnectors.framework.common.objects.filter.FilterTranslator;
 import org.identityconnectors.framework.spi.Connector;
+import org.identityconnectors.framework.spi.ConnectorClass;
 import org.identityconnectors.framework.spi.Configuration;
 import org.identityconnectors.framework.spi.operations.*;
-import org.identityconnectors.framework.common.objects.ConnectorMessages;
 
 import java.util.List;
 import java.util.Set;
 
+@ConnectorClass(
+        displayNameKey = "koha.connector.display",
+        configurationClass = KohaConfiguration.class
+)
 public class KohaConnector implements Connector,
         CreateOp, UpdateOp, DeleteOp, SearchOp<Filter>, SchemaOp, TestOp {
 
@@ -32,13 +36,13 @@ public class KohaConnector implements Connector,
         this.configuration = (KohaConfiguration) configuration;
         this.endpointRegistry = new EndpointRegistry(this.configuration);
 
-        // ✅ Obtener mensajes localizados desde la configuración
+        // Cargar mensajes localizados
         ConnectorMessages messages = this.configuration.getConnectorMessages();
 
-        // ✅ Inicializar el schema registry con los mensajes
+        // Registrar schemas localizados
         this.schemaRegistry = new SchemaRegistry(messages);
 
-        // ✅ Pasar los mensajes al CRUD
+        // Inicializar operaciones
         this.crudOperations = new KohaCrudOperations(endpointRegistry, schemaRegistry, messages);
     }
 
@@ -49,7 +53,7 @@ public class KohaConnector implements Connector,
 
     @Override
     public void dispose() {
-        // Nada que liberar aún
+        // Liberación de recursos si es necesario
     }
 
     @Override
@@ -61,7 +65,7 @@ public class KohaConnector implements Connector,
 
     @Override
     public FilterTranslator<Filter> createFilterTranslator(ObjectClass objectClass, OperationOptions options) {
-        return filter -> List.of(filter); // Retorna el filtro tal como está
+        return filter -> List.of(filter); // Delega el filtro directamente
     }
 
     @Override
