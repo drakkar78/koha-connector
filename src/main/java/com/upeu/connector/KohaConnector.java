@@ -2,16 +2,20 @@ package com.upeu.connector;
 
 import com.upeu.connector.handler.PatronHandler;
 import com.upeu.connector.model.Patron;
+import com.upeu.connector.operations.KohaCrudOperations;
 import com.upeu.connector.util.EndpointRegistry;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
+import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.*;
-import org.identityconnectors.framework.spi.Configuration;
-import org.identityconnectors.framework.spi.Connector;
+import org.identityconnectors.framework.spi.*;
 
 import java.util.List;
+import java.util.Set;
 
-public class KohaConnector implements Connector {
+public class KohaConnector implements Connector,
+        CreateOp, UpdateOp, DeleteOp, SearchOp<String>, SchemaOp, TestOp {
 
+    private KohaCrudOperations crudOperations;
     private EndpointRegistry endpointRegistry;
     private KohaConfiguration configuration;
 
@@ -22,6 +26,7 @@ public class KohaConnector implements Connector {
         }
         this.configuration = (KohaConfiguration) configuration;
         this.endpointRegistry = new EndpointRegistry(this.configuration);
+        this.crudOperations = new KohaCrudOperations(endpointRegistry);
     }
 
     @Override
@@ -34,83 +39,47 @@ public class KohaConnector implements Connector {
         // Nada que liberar aún
     }
 
+    @Override
     public void test() {
         if (!endpointRegistry.ping()) {
             throw new ConnectorException("La API de Koha no respondió al test.");
         }
     }
 
+    @Override
+    public Uid create(ObjectClass objectClass, Set<Attribute> attributes, OperationOptions options) {
+        return crudOperations.create(objectClass, attributes, options);
+    }
+
+    @Override
+    public Uid update(ObjectClass objectClass, Uid uid, Set<Attribute> attributes, OperationOptions options) {
+        return crudOperations.update(objectClass, uid, attributes, options);
+    }
+
+    @Override
+    public void delete(ObjectClass objectClass, Uid uid, OperationOptions options) {
+        crudOperations.delete(objectClass, uid, options);
+    }
+
+    @Override
+    public void executeQuery(ObjectClass objectClass, Filter filter, ResultsHandler handler, OperationOptions options) {
+        crudOperations.search(objectClass, filter, handler, options);
+    }
+
+    @Override
+    public Schema schema() {
+        return crudOperations.schema();
+    }
+
+    // Opcional: para pruebas unitarias o extensiones
     public PatronHandler createPatronHandler() {
         return new PatronHandler(endpointRegistry) {
             @Override
-            public List<Patron> visitAndFilter(Void unused, AndFilter andFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitContainsFilter(Void unused, ContainsFilter containsFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitContainsAllValuesFilter(Void unused, ContainsAllValuesFilter containsAllValuesFilter) {
-                return List.of();
-            }
-
-            @Override
             public List<Patron> visitEqualsFilter(Void unused, EqualsFilter equalsFilter) {
-                return List.of();
+                return List.of(); // implementar si se necesita lógica aquí directamente
             }
 
-            @Override
-            public List<Patron> visitExtendedFilter(Void unused, Filter filter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitGreaterThanFilter(Void unused, GreaterThanFilter greaterThanFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitGreaterThanOrEqualFilter(Void unused, GreaterThanOrEqualFilter greaterThanOrEqualFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitLessThanFilter(Void unused, LessThanFilter lessThanFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitLessThanOrEqualFilter(Void unused, LessThanOrEqualFilter lessThanOrEqualFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitNotFilter(Void unused, NotFilter notFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitOrFilter(Void unused, OrFilter orFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitStartsWithFilter(Void unused, StartsWithFilter startsWithFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitEndsWithFilter(Void unused, EndsWithFilter endsWithFilter) {
-                return List.of();
-            }
-
-            @Override
-            public List<Patron> visitEqualsIgnoreCaseFilter(Void unused, EqualsIgnoreCaseFilter equalsIgnoreCaseFilter) {
-                return List.of();
-            }
+            // Demás filtros aún no implementados directamente
         };
     }
 }
