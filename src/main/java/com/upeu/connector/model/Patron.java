@@ -45,7 +45,7 @@ public class Patron {
             if (value == null) continue;
 
             switch (name) {
-                case Name.NAME:
+                case "__NAME__":
                 case "cardnumber":
                     patron.setCardnumber(value.toString());
                     break;

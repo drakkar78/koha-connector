@@ -4,6 +4,7 @@ import com.upeu.connector.handler.PatronHandler;
 import com.upeu.connector.model.Patron;
 import com.upeu.connector.operations.KohaCrudOperations;
 import com.upeu.connector.util.EndpointRegistry;
+import org.identityconnectors.framework.spi.operations.*;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.*;
@@ -13,11 +14,22 @@ import java.util.List;
 import java.util.Set;
 
 public class KohaConnector implements Connector,
-        CreateOp, UpdateOp, DeleteOp, SearchOp<String>, SchemaOp, TestOp {
+        CreateOp, UpdateOp, DeleteOp, SearchOp<Filter>, SchemaOp, TestOp {
 
     private KohaCrudOperations crudOperations;
     private EndpointRegistry endpointRegistry;
     private KohaConfiguration configuration;
+
+    @Override
+    public FilterTranslator<Filter> createFilterTranslator(ObjectClass objectClass, OperationOptions options) {
+        return new FilterTranslator<>() {
+            @Override
+            public List<Filter> translate(Filter filter) {
+                // Retorna una lista con el filtro tal como está, para delegar a executeQuery
+                return List.of(filter);
+            }
+        };
+    }
 
     @Override
     public void init(Configuration configuration) {
@@ -71,15 +83,4 @@ public class KohaConnector implements Connector,
         return crudOperations.schema();
     }
 
-    // Opcional: para pruebas unitarias o extensiones
-    public PatronHandler createPatronHandler() {
-        return new PatronHandler(endpointRegistry) {
-            @Override
-            public List<Patron> visitEqualsFilter(Void unused, EqualsFilter equalsFilter) {
-                return List.of(); // implementar si se necesita lógica aquí directamente
-            }
-
-            // Demás filtros aún no implementados directamente
-        };
-    }
 }

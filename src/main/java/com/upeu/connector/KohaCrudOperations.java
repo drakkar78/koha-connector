@@ -1,12 +1,13 @@
 package com.upeu.connector.operations;
 
+import com.upeu.connector.KohaConnector;
+import com.upeu.connector.handler.DefaultPatronHandler;
 import com.upeu.connector.handler.PatronHandler;
 import com.upeu.connector.model.Patron;
 import com.upeu.connector.schema.PatronSchema;
 import com.upeu.connector.util.EndpointRegistry;
 import com.upeu.connector.util.SchemaRegistry;
 import org.identityconnectors.framework.common.objects.*;
-import org.identityconnectors.framework.common.objects.filter.EqualsFilter;
 import org.identityconnectors.framework.common.objects.filter.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +24,13 @@ public class KohaCrudOperations {
 
     public KohaCrudOperations(EndpointRegistry endpointRegistry) {
         this.endpointRegistry = endpointRegistry;
-        this.schemaRegistry = new SchemaRegistry(); // Incluye schema __ACCOUNT__
+        this.schemaRegistry = new SchemaRegistry();
     }
 
     public Uid create(ObjectClass objectClass, Set<Attribute> attributes, OperationOptions options) {
-        if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
-            throw new IllegalArgumentException("Soporte solo para tipo __ACCOUNT__");
-        }
+        validateAccountType(objectClass);
 
-        PatronHandler handler = new PatronHandler(endpointRegistry) {};
+        PatronHandler handler = new DefaultPatronHandler(endpointRegistry);
         Patron patron = Patron.fromAttributes(attributes);
         Patron created = handler.create(patron);
 
@@ -39,11 +38,9 @@ public class KohaCrudOperations {
     }
 
     public Uid update(ObjectClass objectClass, Uid uid, Set<Attribute> attributes, OperationOptions options) {
-        if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
-            throw new IllegalArgumentException("Solo se soporta el tipo __ACCOUNT__");
-        }
+        validateAccountType(objectClass);
 
-        PatronHandler handler = new PatronHandler(endpointRegistry) {};
+        PatronHandler handler = new DefaultPatronHandler(endpointRegistry);
         Patron updatedPatron = Patron.fromAttributes(attributes);
         String borrowerNumber = uid.getUidValue();
 
@@ -53,11 +50,9 @@ public class KohaCrudOperations {
     }
 
     public void delete(ObjectClass objectClass, Uid uid, OperationOptions options) {
-        if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
-            throw new IllegalArgumentException("Solo se soporta el tipo __ACCOUNT__");
-        }
+        validateAccountType(objectClass);
 
-        PatronHandler handler = new PatronHandler(endpointRegistry) {};
+        PatronHandler handler = new DefaultPatronHandler(endpointRegistry);
         String borrowerNumber = uid.getUidValue();
 
         boolean deleted = handler.deleteByBorrowerNumber(borrowerNumber);
@@ -67,24 +62,13 @@ public class KohaCrudOperations {
     }
 
     public void search(ObjectClass objectClass, Filter filter, ResultsHandler handler, OperationOptions options) {
-        if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
-            throw new IllegalArgumentException("Soporte solo para tipo __ACCOUNT__");
-        }
+        validateAccountType(objectClass);
 
-        PatronHandler patronHandler = new PatronHandler(endpointRegistry) {
-            @Override
-            public List<Patron> visitEqualsFilter(EqualsFilter filter, Void param) {
-                return super.visitEqualsFilter(filter, param);
-            }
-        };
+        PatronHandler patronHandler = new DefaultPatronHandler(endpointRegistry);
 
-        List<Patron> results;
-
-        if (filter == null) {
-            results = patronHandler.getAll();
-        } else {
-            results = filter.accept(patronHandler, null);
-        }
+        List<Patron> results = (filter == null)
+                ? patronHandler.getAll()
+                : filter.accept(patronHandler, null);
 
         for (Patron patron : results) {
             ConnectorObject object = buildConnectorObject(patron);
@@ -93,7 +77,7 @@ public class KohaCrudOperations {
     }
 
     public Schema schema() {
-        SchemaBuilder builder = new SchemaBuilder(KohaCrudOperations.class);
+        SchemaBuilder builder = new SchemaBuilder(KohaConnector.class);
         builder.defineObjectClass(schemaRegistry.getSchema(ObjectClass.ACCOUNT_NAME));
         return builder.build();
     }
@@ -105,7 +89,6 @@ public class KohaCrudOperations {
         builder.setUid(patron.getBorrowernumber());
         builder.setName(patron.getCardnumber());
 
-        // Atributos
         builder.addAttribute("userid", patron.getUserid());
         builder.addAttribute("surname", patron.getSurname());
         builder.addAttribute("firstname", patron.getFirstname());
@@ -116,5 +99,11 @@ public class KohaCrudOperations {
         builder.addAttribute("borrowernumber", patron.getBorrowernumber());
 
         return builder.build();
+    }
+
+    private void validateAccountType(ObjectClass objectClass) {
+        if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
+            throw new IllegalArgumentException("Soporte solo para tipo __ACCOUNT__");
+        }
     }
 }
