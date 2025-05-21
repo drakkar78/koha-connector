@@ -85,9 +85,10 @@ public class Patron {
         if (userid != null)        json.put("userid", userid);
         if (surname != null)       json.put("surname", surname);
         if (firstname != null)     json.put("firstname", firstname);
-        if (categorycode != null)  json.put("categorycode", categorycode);
-        if (branchcode != null)    json.put("branchcode", branchcode);
         if (email != null)         json.put("email", email);
+        if (categorycode != null)  json.put("category_id", categorycode);
+        if (branchcode != null)    json.put("library_id", branchcode);
+
         return json;
     }
 
