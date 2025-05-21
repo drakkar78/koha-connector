@@ -1,16 +1,16 @@
 package com.upeu.connector;
 
-import com.upeu.connector.handler.PatronHandler;
-import com.upeu.connector.model.Patron;
 import com.upeu.connector.operations.KohaCrudOperations;
 import com.upeu.connector.util.EndpointRegistry;
-import org.identityconnectors.framework.spi.operations.*;
+import com.upeu.connector.util.SchemaRegistry;
 import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.*;
-import org.identityconnectors.framework.common.objects.filter.*;
-import org.identityconnectors.framework.spi.*;
-import org.identityconnectors.framework.spi.ConnectorMessages;
-import org.identityconnectors.framework.spi.helpers.ConnectorHelper;
+import org.identityconnectors.framework.common.objects.filter.Filter;
+import org.identityconnectors.framework.common.objects.filter.FilterTranslator;
+import org.identityconnectors.framework.spi.Connector;
+import org.identityconnectors.framework.spi.Configuration;
+import org.identityconnectors.framework.spi.operations.*;
+import org.identityconnectors.framework.common.objects.ConnectorMessages;
 
 import java.util.List;
 import java.util.Set;
@@ -21,18 +21,7 @@ public class KohaConnector implements Connector,
     private KohaCrudOperations crudOperations;
     private EndpointRegistry endpointRegistry;
     private KohaConfiguration configuration;
-    private ConnectorMessages connectorMessages;
-
-    @Override
-    public FilterTranslator<Filter> createFilterTranslator(ObjectClass objectClass, OperationOptions options) {
-        return new FilterTranslator<>() {
-            @Override
-            public List<Filter> translate(Filter filter) {
-                // Retorna una lista con el filtro tal como está, para delegar a executeQuery
-                return List.of(filter);
-            }
-        };
-    }
+    private SchemaRegistry schemaRegistry;
 
     @Override
     public void init(Configuration configuration) {
@@ -43,11 +32,14 @@ public class KohaConnector implements Connector,
         this.configuration = (KohaConfiguration) configuration;
         this.endpointRegistry = new EndpointRegistry(this.configuration);
 
-        // Inicializa los mensajes localizados desde koha-messages.properties
-        this.connectorMessages = ConnectorHelper.getConnectorMessages(configuration, this.getClass());
+        // ✅ Obtener mensajes localizados desde la configuración
+        ConnectorMessages messages = this.configuration.getConnectorMessages();
 
-        // Ahora pasa los mensajes al CRUD
-        this.crudOperations = new KohaCrudOperations(endpointRegistry, connectorMessages);
+        // ✅ Inicializar el registry con los mensajes
+        this.schemaRegistry = new SchemaRegistry(messages);
+
+        // ✅ Inicializar operaciones CRUD con el registry
+        this.crudOperations = new KohaCrudOperations(endpointRegistry, schemaRegistry);
     }
 
     @Override
@@ -65,6 +57,11 @@ public class KohaConnector implements Connector,
         if (!endpointRegistry.ping()) {
             throw new ConnectorException("La API de Koha no respondió al test.");
         }
+    }
+
+    @Override
+    public FilterTranslator<Filter> createFilterTranslator(ObjectClass objectClass, OperationOptions options) {
+        return filter -> List.of(filter); // Retorna el filtro tal como está
     }
 
     @Override
@@ -91,5 +88,4 @@ public class KohaConnector implements Connector,
     public Schema schema() {
         return crudOperations.schema();
     }
-
 }

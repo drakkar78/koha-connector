@@ -2,7 +2,7 @@ package com.upeu.connector.util;
 
 import com.upeu.connector.schema.PatronSchema;
 import org.identityconnectors.framework.common.objects.ObjectClassInfo;
-import org.identityconnectors.framework.spi.localization.ConnectorMessages;
+import org.identityconnectors.framework.common.objects.ConnectorMessages;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,12 +12,13 @@ public class SchemaRegistry {
 
     private final Map<String, ObjectClassInfo> schemaMap = new HashMap<>();
 
+    // ✅ Constructor que acepta ConnectorMessages
     public SchemaRegistry(ConnectorMessages messages) {
         loadSchemas(messages);
     }
 
     private void loadSchemas(ConnectorMessages messages) {
-        ObjectClassInfo patronSchema = PatronSchema.build(messages);
+        ObjectClassInfo patronSchema = PatronSchema.build(messages); // <-- Pasa los mensajes
         schemaMap.put("account", patronSchema);
     }
 

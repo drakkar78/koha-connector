@@ -9,7 +9,6 @@ import com.upeu.connector.util.EndpointRegistry;
 import com.upeu.connector.util.SchemaRegistry;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.Filter;
-import org.identityconnectors.framework.spi.ConnectorMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
