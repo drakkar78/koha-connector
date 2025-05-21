@@ -21,10 +21,12 @@ public class KohaCrudOperations {
 
     private final EndpointRegistry endpointRegistry;
     private final SchemaRegistry schemaRegistry;
+    private final ConnectorMessages messages;
 
     public KohaCrudOperations(EndpointRegistry endpointRegistry, SchemaRegistry schemaRegistry) {
         this.endpointRegistry = endpointRegistry;
         this.schemaRegistry = schemaRegistry;
+        this.messages = messages;
     }
 
     public Uid create(ObjectClass objectClass, Set<Attribute> attributes, OperationOptions options) {
@@ -57,7 +59,9 @@ public class KohaCrudOperations {
 
         boolean deleted = handler.deleteByBorrowerNumber(borrowerNumber);
         if (!deleted) {
-            throw new RuntimeException(messages.format("error.delete.failed", borrowerNumber));
+            String msg = messages != null ? messages.format("error.delete.failed", borrowerNumber) :
+                    "No se pudo eliminar el usuario con ID " + borrowerNumber;
+            throw new RuntimeException(msg);
         }
     }
 
@@ -103,7 +107,8 @@ public class KohaCrudOperations {
 
     private void validateAccountType(ObjectClass objectClass) {
         if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
-            String msg = messages.format("error.unsupported.objectclass", objectClass.getObjectClassValue());
+            String msg = messages != null ? messages.format("error.unsupported.objectclass", objectClass.getObjectClassValue()) :
+                    "ObjectClass no soportado: " + objectClass.getObjectClassValue();
             throw new IllegalArgumentException(msg);
         }
     }

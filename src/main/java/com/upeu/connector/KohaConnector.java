@@ -39,7 +39,7 @@ public class KohaConnector implements Connector,
         this.schemaRegistry = new SchemaRegistry(messages);
 
         // ✅ Pasar los mensajes al CRUD
-        this.crudOperations = new KohaCrudOperations(endpointRegistry, schemaRegistry);
+        this.crudOperations = new KohaCrudOperations(endpointRegistry, schemaRegistry, messages);
     }
 
     @Override
