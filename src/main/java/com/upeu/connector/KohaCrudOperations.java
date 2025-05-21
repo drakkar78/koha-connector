@@ -9,6 +9,7 @@ import com.upeu.connector.util.EndpointRegistry;
 import com.upeu.connector.util.SchemaRegistry;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.Filter;
+import org.identityconnectors.framework.spi.ConnectorMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +22,12 @@ public class KohaCrudOperations {
 
     private final EndpointRegistry endpointRegistry;
     private final SchemaRegistry schemaRegistry;
+    private final ConnectorMessages messages;
 
-    public KohaCrudOperations(EndpointRegistry endpointRegistry) {
+    public KohaCrudOperations(EndpointRegistry endpointRegistry, ConnectorMessages messages) {
         this.endpointRegistry = endpointRegistry;
         this.schemaRegistry = new SchemaRegistry();
+        this.messages = messages;
     }
 
     public Uid create(ObjectClass objectClass, Set<Attribute> attributes, OperationOptions options) {
@@ -57,7 +60,7 @@ public class KohaCrudOperations {
 
         boolean deleted = handler.deleteByBorrowerNumber(borrowerNumber);
         if (!deleted) {
-            throw new RuntimeException("No se pudo eliminar el usuario con ID " + borrowerNumber);
+            throw new RuntimeException(messages.format("error.delete.failed", borrowerNumber));
         }
     }
 
@@ -103,7 +106,8 @@ public class KohaCrudOperations {
 
     private void validateAccountType(ObjectClass objectClass) {
         if (!objectClass.is(ObjectClass.ACCOUNT_NAME)) {
-            throw new IllegalArgumentException("Soporte solo para tipo __ACCOUNT__");
+            String msg = messages.format("error.unsupported.objectclass", objectClass.getObjectClassValue());
+            throw new IllegalArgumentException(msg);
         }
     }
 }

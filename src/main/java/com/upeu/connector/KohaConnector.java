@@ -9,6 +9,8 @@ import org.identityconnectors.framework.common.exceptions.ConnectorException;
 import org.identityconnectors.framework.common.objects.*;
 import org.identityconnectors.framework.common.objects.filter.*;
 import org.identityconnectors.framework.spi.*;
+import org.identityconnectors.framework.spi.ConnectorMessages;
+import org.identityconnectors.framework.spi.helpers.ConnectorHelper;
 
 import java.util.List;
 import java.util.Set;
@@ -19,6 +21,7 @@ public class KohaConnector implements Connector,
     private KohaCrudOperations crudOperations;
     private EndpointRegistry endpointRegistry;
     private KohaConfiguration configuration;
+    private ConnectorMessages connectorMessages;
 
     @Override
     public FilterTranslator<Filter> createFilterTranslator(ObjectClass objectClass, OperationOptions options) {
@@ -36,9 +39,15 @@ public class KohaConnector implements Connector,
         if (!(configuration instanceof KohaConfiguration)) {
             throw new IllegalArgumentException("Configuración inválida");
         }
+
         this.configuration = (KohaConfiguration) configuration;
         this.endpointRegistry = new EndpointRegistry(this.configuration);
-        this.crudOperations = new KohaCrudOperations(endpointRegistry);
+
+        // Inicializa los mensajes localizados desde koha-messages.properties
+        this.connectorMessages = ConnectorHelper.getConnectorMessages(configuration, this.getClass());
+
+        // Ahora pasa los mensajes al CRUD
+        this.crudOperations = new KohaCrudOperations(endpointRegistry, connectorMessages);
     }
 
     @Override
