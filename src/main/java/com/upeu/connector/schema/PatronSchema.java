@@ -1,42 +1,33 @@
 package com.upeu.connector.schema;
 
-import org.identityconnectors.framework.common.objects.AttributeInfo;
-import org.identityconnectors.framework.common.objects.AttributeInfoBuilder;
-import org.identityconnectors.framework.common.objects.ObjectClassInfo;
-import org.identityconnectors.framework.common.objects.ObjectClassInfoBuilder;
+import org.identityconnectors.framework.common.objects.*;
+import org.identityconnectors.framework.spi.ConnectorMessages;
 
-import java.util.HashSet;
-import java.util.Set;
-
-/**
- * Define el esquema de atributos del objeto Patron (usuario) en Koha.
- */
 public class PatronSchema {
 
-    private final ObjectClassInfo patronSchema;
-
-    public PatronSchema() {
+    public static ObjectClassInfo build(ConnectorMessages messages) {
         ObjectClassInfoBuilder builder = new ObjectClassInfoBuilder();
+        builder.setType(ObjectClass.ACCOUNT_NAME);
 
-        builder.setType("account"); // Tipo estándar ConnId para usuarios
+        builder.addAttributeInfo(buildAttr("userid", messages));
+        builder.addAttributeInfo(buildAttr("surname", messages));
+        builder.addAttributeInfo(buildAttr("firstname", messages));
+        builder.addAttributeInfo(buildAttr("email", messages));
+        builder.addAttributeInfo(buildAttr("cardnumber", messages));
+        builder.addAttributeInfo(buildAttr("categorycode", messages));
+        builder.addAttributeInfo(buildAttr("branchcode", messages));
+        builder.addAttributeInfo(buildAttr("borrowernumber", messages));
 
-        Set<AttributeInfo> attributes = new HashSet<>();
-
-        attributes.add(AttributeInfoBuilder.build("userid", String.class));           // nombre de usuario
-        attributes.add(AttributeInfoBuilder.build("surname", String.class));          // apellido
-        attributes.add(AttributeInfoBuilder.build("firstname", String.class));        // nombre
-        attributes.add(AttributeInfoBuilder.build("email", String.class));            // correo electrónico
-        attributes.add(AttributeInfoBuilder.build("cardnumber", String.class));       // número de tarjeta
-        attributes.add(AttributeInfoBuilder.build("categorycode", String.class));     // categoría de usuario
-        attributes.add(AttributeInfoBuilder.build("branchcode", String.class));       // biblioteca
-        attributes.add(AttributeInfoBuilder.build("borrowernumber", String.class));   // ID interno
-
-        builder.addAllAttributeInfo(attributes);
-
-        this.patronSchema = builder.build();
+        return builder.build();
     }
 
-    public ObjectClassInfo getPatronSchema() {
-        return patronSchema;
+    private static AttributeInfo buildAttr(String name, ConnectorMessages messages) {
+        AttributeInfoBuilder attr = new AttributeInfoBuilder(name);
+        attr.setType(String.class);
+
+        String label = messages.format("attribute." + name, name);
+        attr.setDisplayName(label);
+
+        return attr.build();
     }
 }

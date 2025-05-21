@@ -26,7 +26,7 @@ public class KohaCrudOperations {
 
     public KohaCrudOperations(EndpointRegistry endpointRegistry, ConnectorMessages messages) {
         this.endpointRegistry = endpointRegistry;
-        this.schemaRegistry = new SchemaRegistry();
+        this.schemaRegistry = new SchemaRegistry(messages);
         this.messages = messages;
     }
 
